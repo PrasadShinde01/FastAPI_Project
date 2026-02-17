@@ -32,6 +32,15 @@ async def marksare(i):
     return markss
 
 
+@app.get("/marksSum/{i}")
+async def marksare(i):
+    k = type(i)
+    print('......................',k)
+    print('......................', type(i))  # Debugging the type of 'i'
+    print('Type of markss:', type(markss))  # Debugging the
+    sumIs = sum(markss)
+    return sumIs
+
 
 @app.get("/egapi/{i}")
 async def egapi(i):
