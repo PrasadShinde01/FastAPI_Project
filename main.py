@@ -22,7 +22,8 @@ def read_root():
     #return FileResponse(BASE_DIR / "static/view.html")
     return {'this is FastAPI app!!!!'}
 
-markss = '[12,23,13,13,31,31]'
+markss = '[12,23,13,13,31]'
+marksList = [12,23,13,13,31]
 @app.get("/marks/{i}")
 async def marksare(i):
     k = type(i)
@@ -34,13 +35,14 @@ async def marksare(i):
 
 @app.get("/marksSum/{i}")
 async def marksare(i):
-    k = type(i)
-    print('......................',k)
-    print('......................', type(i))  # Debugging the type of 'i'
-    print('Type of markss:', type(markss))  # Debugging the
     sumIs = sum(markss)
     return sumIs
 
+@app.get("/Maxmarks/")
+async def marksare():
+    maxMarks = max(marksList)
+    print('max marks in list:',maxMarks)
+    return maxMarks
 
 @app.get("/egapi/{i}")
 async def egapi(i):
