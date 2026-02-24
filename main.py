@@ -44,6 +44,12 @@ async def marksare():
     print('max marks in list:',maxMarks)
     return maxMarks
 
+@app.get("/MinMarks/")
+async def marksare():
+    minMarks = min(marksList)
+    print('max marks in list:',maxMarks)
+    return minMarks
+
 @app.get("/egapi/{i}")
 async def egapi(i):
     k = 10 
