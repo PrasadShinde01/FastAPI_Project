@@ -50,6 +50,13 @@ async def marksare():
     print('min marks in list:',minMarks)
     return minMarks
 
+@app.get("/revList/")
+async def marksare():
+    revList = list(reversed(marksList))
+    print('min marks in list:',revList)
+    return revList
+
+
 @app.get("/egapi/{i}")
 async def egapi(i):
     k = 10 
