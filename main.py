@@ -4,6 +4,7 @@ from pathlib import Path
 from pydantic import BaseModel
 from fastapi.params import Body
 from typing import Optional
+from enum import Enum
 
 
 app = FastAPI()
@@ -122,3 +123,63 @@ students = [
 @app.get("/postss/{id}")
 def getStud(id:int):
     return(f"this is the data at index{id}", students[id])
+
+class ItemGrosseries(str, Enum):
+    SoyaChunks =  "Soyachunks"
+    SoyaOil =  "SoyaOil"
+    SoyaMilk =  "Soyamilk"
+
+@app.get("/Grosseries/{itemGrosseries}")
+async def itemGrosseries(itemGrosseries:ItemGrosseries):
+    if itemGrosseries is ItemGrosseries.SoyaChunks:
+        return {f"this itme is Soyachunks"}
+    if itemGrosseries is ItemGrosseries.SoyaOil:
+        return(f"this itme is SoyaOil")
+    if itemGrosseries is ItemGrosseries.SoyaMilk:
+        return(f"this itme is Soyamilk")
+
+@app.get("/Grosseries/json/{itemGrosseries}")
+async def itemGrosseries(itemGrosseries:ItemGrosseries):
+    if itemGrosseries.value == "Soyachunks" :
+        return {"itemGrosseries":itemGrosseries,"message":"this is some kind of message"}
+    if itemGrosseries is ItemGrosseries.SoyaOil:
+        return(f"this itme is SoyaOil")
+    # return {"model_name": itemGrosseries, "message": "Have some residuals"}
+
+class ModelName(str, Enum):
+    alexnet = "alexnet"
+    resnet = "resnet"
+    lenet = "lenet"
+
+@app.get("/models/{model_name}")
+async def get_model(model_name: ModelName):
+    if model_name is ModelName.alexnet:
+        return {"model_name": model_name, "message": "Deep Learning FTW!"}
+
+    if model_name.value == "lenet":
+        return {"model_name": model_name, "message": "LeCNN all the images"}
+
+    return {"model_name": model_name, "message": "Have some residuals"}
+
+
+@app.get("/files/{file_path:path}")
+async def read_file(file_path: str):
+    return {"file_path": file_path}
+#####################3
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+@app.get("/item/{id}")
+async def itemId(id:int):
+    return {"id is ":id}
+
+@app.get("/itemss/{name}")
+async def itemName(name:str):
+    return {"the name is ":name}
+
+@app.get("/item/defaultId")
+async def itemId(id:int):
+    return {f"this is the default id 1111"}
+    #eturn(f"this is the data at index{id}", students[id])
