@@ -183,3 +183,17 @@ async def itemName(name:str):
 async def itemId(id:int):
     return {f"this is the default id 1111"}
     #eturn(f"this is the data at index{id}", students[id])
+
+def getStudentId(n):
+    for i in students:
+        if i["id"] == n:   # ✅ FIXED
+            return i
+    return None
+
+@app.get("/studentdata/{id}")
+async def studentByID(id: int, response: Response):
+    student = getStudentId(id)
+    if not student:
+        response.status_code = 404
+    #print(student)
+    return student
