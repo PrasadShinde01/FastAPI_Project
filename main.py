@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pathlib import Path
 from pydantic import BaseModel
@@ -6,6 +6,7 @@ from fastapi.params import Body
 from typing import Optional
 from enum import Enum
 from fastapi import Response
+from fastapi import status
 
 
 app = FastAPI()
@@ -198,3 +199,19 @@ async def studentByID(id: int, response: Response):
         response.status_code = 404
     #print(student)
     return student
+
+def getStudentIndex(student_id: int):
+    for index, student in enumerate(students):
+        if student["id"] == student_id:
+            return index
+    return None
+
+
+@app.delete("/delStudentBy/{id}",status_code=status.HTTP_204_NO_CONTENT)
+async def delStudentByID(id:int):
+    index = getStudentIndex(id)
+    if index == None:   
+        raise HTTPException(status_code=status.HTTP_204_NOT_FOUND,detail= f"student wwith {id} not exist")
+    students.pop(index)
+    print(students)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
