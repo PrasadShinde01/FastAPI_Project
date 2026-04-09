@@ -195,6 +195,7 @@ def getStudentId(n):
 @app.get("/studentdata/{id}")
 async def studentByID(id: int, response: Response):
     student = getStudentId(id)
+    print(students)
     if not student:
         response.status_code = 404
     #print(student)
@@ -215,3 +216,18 @@ async def delStudentByID(id:int):
     students.pop(index)
     print(students)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@app.put("/UpdStudent/id")
+async def updateStudent(id:int,name:str):
+    index = getStudentIndex(id)
+    std = students[index] 
+    print(std)
+    print('students typeeeee',type(students))
+    if std["id"]== id:
+        std["name"] = name 
+    print('updated std>>>>', std)
+    return std
+
+
+# print(students)
+# print(type(students))

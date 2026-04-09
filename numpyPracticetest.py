@@ -1,10 +1,13 @@
+import main
+
 class Computer:
     def __init__(self,cpu,ram):
         self.cpu = cpu
         self.ram = ram
 
     def config(self):
-        print('config of this com is',self.cpu,self.ram)
+        pass
+        # print('config of this com is',self.cpu,self.ram)
 
 comp1 = Computer('i7',32)
 comp2 = Computer("Ryzon5",16)
@@ -15,9 +18,11 @@ comp2.config()
 
 def recPract(num):
     if num <= 0:
-        print('this is Zeerooo') 
+        pass
+        # print('this is Zeerooo') 
     else:
-        print(f"this is {num}")
+        pass
+        # print(f"this is {num}")
         recPract(num-1)
 recPract(4)
 
@@ -28,7 +33,8 @@ class ComputerDefault:
         self.ram = ram
 
     def config(self):
-        print("Default Config:", self.cpu, self.ram)
+        pass
+        # print("Default Config:", self.cpu, self.ram)
 
 comp_default = ComputerDefault()  # no arguments passed
 comp_default.config()
@@ -53,7 +59,8 @@ class ComputerAlt:
         return cls(cpu, int(ram))
 
     def config(self):
-        print("Alt Constructor Config:", self.cpu, self.ram)
+        pass
+        # print("Alt Constructor Config:", self.cpu, self.ram)
 
 comp_alt = ComputerAlt.from_string("i5-16")
 comp_alt.config()
@@ -68,7 +75,8 @@ class ComputerValidated:
         self.ram = ram
 
     def config(self):
-        print("Validated Config:", self.cpu, self.ram)
+        pass
+        # print("Validated Config:", self.cpu, self.ram)
 
 comp_valid = ComputerValidated("i7", 16)
 comp_valid.config()
@@ -84,7 +92,7 @@ class ComputerStr:
         return f"Computer(cpu={self.cpu}, ram={self.ram}GB)"
 
 comp_str = ComputerStr("Ryzen7", 32)
-print(comp_str)  # automatically calls __str__
+# print(comp_str)  # automatically calls __str__
 
 
 # 6. Copy constructor-like behavior (not built-in, but manual)
@@ -98,7 +106,8 @@ class ComputerCopy:
         return cls(other_obj.cpu, other_obj.ram)
 
     def config(self):
-        print("Copied Config:", self.cpu, self.ram)
+        pass
+        # print("Copied Config:", self.cpu, self.ram)
 
 original = ComputerCopy("i5", 8)
 copy_obj = ComputerCopy.copy(original)
@@ -110,10 +119,12 @@ copy_obj.config()
 class ComputerDestructor:
     def __init__(self, cpu):
         self.cpu = cpu
-        print(f"{self.cpu} Computer Created")
+        pass
+        # print(f"{self.cpu} Computer Created")
 
     def __del__(self):
-        print(f"{self.cpu} Computer Destroyed")
+        pass
+        # print(f"{self.cpu} Computer Destroyed")
 
 comp_des = ComputerDestructor("i3")
 del comp_des  # manually deleting object
@@ -127,7 +138,53 @@ class ComputerDynamic:
             setattr(self, key, value)
 
     def config(self):
-        print("Dynamic Config:", self.__dict__)
+        pass
+        # print("Dynamic Config:", self.__dict__)
 
 comp_dyn = ComputerDynamic(cpu="i9", ram=64, gpu="RTX 4090")
 comp_dyn.config()
+
+
+
+
+
+
+students = [
+    {
+        "id": 1,
+        "name": "Alice",
+        "age": 16,
+        "grade": "10th",
+        "marks": 88
+    },
+    {
+        "id": 2,
+        "name": "Bob",
+        "age": 15,
+        "grade": "9th",
+        "marks": 92
+    },
+    {
+        "id": 3,
+        "name": "Charlie",
+        "age": 17,
+        "grade": "11th",
+        "marks": 81
+    }
+]
+
+
+#@app.put("/UpdStudent/id")
+
+
+# async def updateStudent(id:int,name:str):
+def updateStudent(id=1,name= "this sis the name"):
+    index = main.getStudentIndex(id)
+    std = students[index] 
+    print(std)
+    print('students typeeeee',type(students))
+    if std["id"]== id:
+        std["name"] = name 
+    print('updated std>>>>', std)
+    return std
+updateStudent()
