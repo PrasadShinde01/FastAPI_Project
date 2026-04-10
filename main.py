@@ -228,6 +228,19 @@ async def updateStudent(id:int,name:str):
     print('updated std>>>>', std)
     return std
 
+@app.post("/AddStudent/id")
+async def updateStudent(id:int,name:str, age:int, grade:str,marks:int):
+    new_student = {
+        "id": id,
+        "name": name,
+        "age": age,
+        "grade": grade,
+        "marks": marks
+    }
+    students.append(new_student)
+
+    print('updated std>>>>',  students)
+    return students
 
 # print(students)
 # print(type(students))
