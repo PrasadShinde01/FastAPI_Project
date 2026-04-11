@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
 from pydantic import BaseModel
 from fastapi.params import Body
@@ -198,6 +198,7 @@ async def studentByID(id: int, response: Response):
     print(students)
     if not student:
         response.status_code = 404
+        print(f"post with {id} does not exist")
     #print(student)
     return student
 
@@ -228,8 +229,22 @@ async def updateStudent(id:int,name:str):
     print('updated std>>>>', std)
     return std
 
-@app.post("/AddStudent/id")
-async def updateStudent(id:int,name:str, age:int, grade:str,marks:int):
+# @app.post("/AddStudent/id")
+# async def updateStudent(id:int,name:str, age:int, grade:str,marks:int):
+#     new_student = {
+#         "id": id,
+#         "name": name,
+#         "age": age,
+#         "grade": grade,
+#         "marks": marks
+#     }
+#     students.append(new_student)
+#     # res = Response(status_code=status.HTTP_204_NO_CONTENT)
+#     return Response(new_student, status_code=status.HTTP_201_CREATED) 
+
+
+@app.post("/AddStudent/{id}")
+async def updateStudent(id: int, name: str, age: int, grade: str, marks: int):
     new_student = {
         "id": id,
         "name": name,
@@ -238,9 +253,8 @@ async def updateStudent(id:int,name:str, age:int, grade:str,marks:int):
         "marks": marks
     }
     students.append(new_student)
-
-    print('updated std>>>>',  students)
-    return students
+    
+    return JSONResponse(content=new_student, status_code=status.HTTP_201_CREATED)
 
 # print(students)
 # print(type(students))
