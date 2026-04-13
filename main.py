@@ -122,6 +122,48 @@ students = [
 ]
 #
 
+@app.put("/UpdStudent/id")
+def updateStudent(id: int = 1, name: str = "this is the name"):
+    """
+    Update the name of a student by ID.
+
+    Args:
+        id (int): Student ID
+        name (str): New name for the student
+
+    Returns:
+        dict: Updated student object
+
+    Raises:
+        ValueError: If student not found or invalid input
+    """
+
+    # ✅ Validate input
+    if not isinstance(id, int):
+        raise ValueError("Invalid ID: must be an integer")
+
+    if not name or not isinstance(name, str):
+        raise ValueError("Invalid name: must be a non-empty string")
+
+    # ✅ Get student index
+    index = getStudentIndex(id)
+
+    if index is None or index >= len(students):
+        raise ValueError(f"Student with id {id} not found")
+
+    # ✅ Fetch student
+    student = students[index]
+
+    # ✅ Validate student structure
+    if not isinstance(student, dict) or "id" not in student:
+        raise ValueError("Invalid student data format")
+
+    # ✅ Update logic (same as your original behavior)
+    if student["id"] == id:
+        student["name"] = name
+
+    return student
+
 @app.get("/postss/{id}")
 def getStud(id:int):
     return(f"this is the data at index{id}", students[id])

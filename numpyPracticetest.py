@@ -178,13 +178,14 @@ students = [
 
 
 # async def updateStudent(id:int,name:str):
-def updateStudent(id=1,name= "this sis the name"):
-    index = main.getStudentIndex(id)
-    std = students[index] 
-    print(std)
-    print('students typeeeee',type(students))
-    if std["id"]== id:
-        std["name"] = name 
-    print('updated std>>>>', std)
-    return std
-updateStudent()
+# def updateStudent(id=1,name= "this sis the name"):
+#     index = main.getStudentIndex(id)
+#     std = students[index] 
+#     print(std)
+#     print('students typeeeee',type(students))
+#     if std["id"]== id:
+#         std["name"] = name 
+#     print('updated std>>>>', std)
+#     return std
+# updateStudent()
+
