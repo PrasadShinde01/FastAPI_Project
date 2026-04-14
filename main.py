@@ -7,6 +7,7 @@ from typing import Optional
 from enum import Enum
 from fastapi import Response
 from fastapi import status
+from typing import Annotated
 
 
 app = FastAPI()
@@ -24,6 +25,14 @@ BASE_DIR = Path(__file__).resolve().parent
 def read_root():
     #return FileResponse(BASE_DIR / "static/view.html")
     return {'this is FastAPI app!!!!'}
+
+
+@app.get("/annotatedeg/name")
+def read_root(name:Annotated[str, 'this is just a metadata']) -> str:
+    #return FileResponse(BASE_DIR / "static/view.html")
+    # names = name
+    return f'this is the input -> {name} an example of Type Hints with Metadata Annotations'
+
 
 markss = '[12,23,13,13,31]'
 marksList = [12,23,13,13,31]
