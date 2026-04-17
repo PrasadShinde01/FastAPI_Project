@@ -349,3 +349,10 @@ async def update_item(item_id: int, item: Item, q: str | None = None):
     if q:
         result.update({"q": q})
     return result
+
+@app.get("/itemsQParamStrVal/")
+async def read_items(q: str | None = None):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
