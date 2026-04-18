@@ -6,7 +6,7 @@ from fastapi.params import Body
 from typing import Optional
 from enum import Enum
 from fastapi import Response
-from fastapi import status
+from fastapi import status, Query
 from typing import Annotated
 
 
@@ -350,8 +350,60 @@ async def update_item(item_id: int, item: Item, q: str | None = None):
         result.update({"q": q})
     return result
 
-@app.get("/itemsQParamStrVal/")
-async def read_items(q: str | None = None):
+@app.get("/itemsQFixVal/")
+async def read_items(q: Annotated[str, Query(min_length=2, max_lenght = 50)] = "fixed query"):   
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        results.update({"q": q})
+    return results
+
+
+
+@app.get("/itemsQNoneVal/")
+async def read_items(q: Annotated[str | None, Query(min_length=2, max_lenght = 50)]):   
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    if q:
+        print("this is now type", type(q))
+        results.update({"q": q})
+    return results
+
+@app.get("/itemsNonetype/")
+async def read_items(q: Annotated[str | None, Query(min_length=3)] = None):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    # if q:
+    print("this is now type", type(q))
+    results.update({"q": q})
+    return results
+
+
+@app.get("/itemsQListtype/")
+async def read_items(q: Annotated[list[str] | None, Query(min_length=3)] = None):
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    # if q:
+    print("this is now type", type(q))
+    results.update({"q": q})
+    return results
+
+@app.get("/itemslistparam/")
+async def read_items(q: Annotated[list[str], Query()] = ["foo", "bar"]):
+    query_items = {"q": q}
+    return query_items
+
+@app.get("/itemsQdescription/")
+async def read_items(
+    q: Annotated[
+        str | None,
+        Query(
+            alias="item-query",
+            title="Query string",
+            description="Query string for the items to search in the database that have a good match",
+            min_length=3,
+            max_length=50,
+            pattern="^fixedquery$",
+            deprecated=True,
+        ),
+    ] = None,
+):
     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
     if q:
         results.update({"q": q})
