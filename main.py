@@ -3,9 +3,9 @@ import random
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
-from pydantic import BaseModel, AfterValidator
+from pydantic import BaseModel, AfterValidator, Field
 from fastapi.params import Body
-from typing import Optional
+from typing import Literal, Optional
 from enum import Enum
 from fastapi import Response
 from fastapi import status, Query
@@ -433,3 +433,13 @@ async def read_items(
     else:
         id, item = random.choice(list(data.items()))
     return {"id": id, "name": item}
+
+class FilterParams(BaseModel):
+    limit: int = Field(100, gt=110, le=1100)
+    offset: int = Field(0, ge=0)
+    order_by: Literal["created_at", "updated_at"] = "created_at"
+    tags: list[str] = []
+
+@app.get("/itemsFilterQuery/")
+async def read_items(filter_query: Annotated[FilterParams, Query()]):
+    return filter_query
