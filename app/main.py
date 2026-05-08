@@ -1,5 +1,5 @@
 import random
-
+import json
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
@@ -443,3 +443,22 @@ class FilterParams(BaseModel):
 @app.get("/itemsFilterQuery/")
 async def read_items(filter_query: Annotated[FilterParams, Query()]):
     return filter_query
+
+
+
+with open('C:/Users/Prasad/fastapi_project/data/data.json') as f:
+    data = json.load(f)
+
+data_length = len(data)
+
+@app.get('/data/posts')
+def get_data():
+    return data
+
+@app.get('/data/Pagination')
+def get_data(start_page:int = 1, end_page:int= 10):
+    start = (start_page-1) * end_page
+    end = start + end_page
+    print(f'{start} start value and end is{end}')
+    dt = data['posts']
+    return dt[start:end]
