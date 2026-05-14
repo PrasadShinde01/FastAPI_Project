@@ -1,4 +1,5 @@
 import random
+from fastapi_pagination import Page, add_pagination, paginate
 import json
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
@@ -462,3 +463,11 @@ def get_data(start_page:int = 1, end_page:int= 10):
     print(f'{start} start value and end is{end}')
     dt = data['posts']
     return dt[start:end]
+
+
+@app.get("/data/fastpagination", response_model=Page[dict])
+def get_data():
+    return paginate(data["posts"])
+
+# Important
+add_pagination(app)
