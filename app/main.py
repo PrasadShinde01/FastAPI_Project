@@ -345,13 +345,18 @@ async def create_item(item: Item):
         item_dict.update({"price_with_tax": price_with_tax})
     return item_dict
 
-
-@app.put("/itemm/{item_id}")
-async def update_item(item_id: int, item: Item, q: str | None = None):
-    result = {"item_id": item_id, **item.model_dump()}
+@app.put("/items/{item_id}")
+async def update_item(
+    item_id: Annotated[int, Path(title="The ID of the item to get", ge=0, le=1000)],
+    q: str | None = None,
+    item: Item | None = None,
+):
+    results = {"item_id": item_id}
     if q:
-        result.update({"q": q})
-    return result
+        results.update({"q": q})
+    if item:
+        results.update({"item": item})
+    return results
 
 @app.get("/itemsQFixVal/")
 async def read_items(q: Annotated[str, Query(min_length=2, max_lenght = 50)] = "fixed query"):   
