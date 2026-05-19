@@ -348,8 +348,8 @@ async def create_item(item: Item):
 @app.put("/items/{item_id}")
 async def update_item(
     item_id: Annotated[int, Path(title="The ID of the item to get", ge=0, le=1000)],
-    q: str | None = None,
-    item: Item | None = None,
+    item: Annotated[Item, Body(embed=True)],
+    q: str | None = None
 ):
     results = {"item_id": item_id}
     if q:
