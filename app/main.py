@@ -476,3 +476,17 @@ def get_data():
 
 # Important
 add_pagination(app)
+
+
+class ItemSet(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: set[str] = set()
+
+
+@app.put("/itemsList/{item_id}")
+async def update_item(item_id: int, itemList: ItemSet):
+    results = {"item_id": item_id, "item": itemList}
+    return results
