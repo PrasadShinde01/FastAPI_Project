@@ -4,7 +4,7 @@ import json
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pathlib import Path
-from pydantic import BaseModel, AfterValidator, Field
+from pydantic import BaseModel, AfterValidator, Field, HttpUrl
 from fastapi.params import Body
 from typing import Literal, Optional
 from enum import Enum
@@ -490,3 +490,30 @@ class ItemSet(BaseModel):
 async def update_item(item_id: int, itemList: ItemSet):
     results = {"item_id": item_id, "item": itemList}
     return results
+
+
+
+class Image(BaseModel):
+    url: HttpUrl
+    name: str
+
+
+class ItemImg(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    tax: float | None = None
+    tags: set[str] = set()
+    images: list[Image] | None = None
+
+
+class Offer(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    items: list[ItemImg]
+
+
+@app.post("/offers/")
+async def create_offer(offer: Offer):
+    return offer
