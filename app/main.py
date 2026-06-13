@@ -11,7 +11,9 @@ from enum import Enum
 from fastapi import Response
 from fastapi import status, Query
 from typing import Annotated
-
+from datetime import datetime
+from decimal import Decimal
+from uuid import UUID, uuid4
 
 app = FastAPI()
 
@@ -517,3 +519,68 @@ class Offer(BaseModel):
 @app.post("/offers/")
 async def create_offer(offer: Offer):
     return offer
+
+class OrderItem(BaseModel):
+    product_name: str
+    quantity: int
+    unit_price: Decimal          # Decimal input → float in JSON response
+    discount_percent: float = 0.0
+
+class OrderRequest(BaseModel):
+    customer_name: str
+    items: list[OrderItem]
+    order_date: datetime         # Accepts ISO string → parsed to datetime object
+    voucher_id: UUID | None = None  # Accepts UUID string → parsed to UUID object
+
+class OrderResponse(BaseModel):
+    order_id: UUID               # UUID object → serialized to string in response
+    customer_name: str
+    items: list[OrderItem]
+    order_date: datetime         # datetime object → serialized to ISO string in response
+    subtotal: float
+    discount_total: float
+    final_total: float
+    processed_at: datetime       # Auto-generated server-side datetime
+    status: str
+
+@app.post("/orders/create", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
+async def create_order(order: OrderRequest):
+    """
+    Demonstrates Data Conversion (Parsing + Serialization):
+
+    PARSING (input):
+      - "unit_price": "19.99"   →  Decimal("19.99")
+      - "order_date": "2024-01-15T10:30:00"  →  datetime object
+      - "voucher_id": "550e8400-e29b-41d4-a716..."  →  UUID object
+
+    SERIALIZATION (output):
+      - UUID   →  "3f6c1b2a-..." string
+      - datetime  →  "2024-01-15T10:30:00" ISO string
+      - Decimal   →  19.99 float
+      - Computed float fields  →  rounded JSON numbers
+    """
+
+    # Pydantic already parsed and validated all input types
+    subtotal = sum(
+        float(item.unit_price) * item.quantity
+        for item in order.items
+    )
+
+    discount_total = sum(
+        float(item.unit_price) * item.quantity * (item.discount_percent / 100)
+        for item in order.items
+    )
+
+    final_total = round(subtotal - discount_total, 2)
+
+    return OrderResponse(
+        order_id=uuid4(),                    # UUID → serialized to string
+        customer_name=order.customer_name,
+        items=order.items,
+        order_date=order.order_date,         # datetime → serialized to ISO string
+        subtotal=round(subtotal, 2),
+        discount_total=round(discount_total, 2),
+        final_total=final_total,
+        processed_at=datetime.now(),         # Server-generated datetime
+        status="confirmed"
+    )
