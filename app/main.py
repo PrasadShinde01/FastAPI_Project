@@ -584,3 +584,123 @@ async def create_order(order: OrderRequest):
         processed_at=datetime.now(),         # Server-generated datetime
         status="confirmed"
     )
+
+#  Declare Request Example Data Extra JSON Schema Data in Pydantic Models
+
+class BookOrder(BaseModel):
+    """
+    Demonstrates both topics together:
+    - Field(title, description, gt, lt) → Extra JSON Schema data
+    - Field(example=...) → per-field example data
+    - model_config with json_schema_extra → whole-body example + custom schema keywords
+    """
+
+    # --- Extra JSON Schema data: title, description, constraints ---
+    book_title: str = Field(
+        title="Book Title",
+        description="Full title of the book being ordered",
+        min_length=2,
+        max_length=200,
+        example="The Pragmatic Programmer"
+    )
+
+    author: str = Field(
+        title="Author Name",
+        description="Full name of the book's author",
+        example="David Thomas"
+    )
+
+    quantity: int = Field(
+        title="Order Quantity",
+        description="Number of copies to order. Must be between 1 and 100.",
+        gt=0,    # gt/lt/ge/le all appear as constraints in the generated JSON Schema
+        le=100,
+        example=3
+    )
+
+    price_per_copy: float = Field(
+        title="Price Per Copy (INR)",
+        description="Unit price in Indian Rupees",
+        gt=0.0,
+        example=599.00
+    )
+
+    genre: Optional[str] = Field(
+        default=None,
+        title="Book Genre",
+        description="Optional genre/category of the book",
+        example="Technology"
+    )
+
+    # --- Extra JSON Schema: model-level config with custom keywords ---
+    model_config = {
+        "json_schema_extra": {
+            # This appears as a complete example in Swagger UI's "Example Value"
+            "example": {
+                "book_title": "Clean Code",
+                "author": "Robert C. Martin",
+                "quantity": 2,
+                "price_per_copy": 749.00,
+                "genre": "Software Engineering"
+            },
+            # Custom keyword — not standard JSON Schema, but shows up in the raw schema
+            "x-internal-category": "book-orders",
+            "x-requires-login": True
+        }
+    }
+
+
+@app.post(
+    "/bookOrders/create",
+    summary="Create a book order",
+    description="Demonstrates **Request Example Data** and **Extra JSON Schema Data**. Check the schema tab in Swagger UI to see titles, descriptions, constraints, and examples.",
+    tags=["Learning - Schema & Examples"]
+)
+async def create_book_order(
+    # openapi_examples on Body() → multiple named examples in Swagger UI
+    order: Annotated[
+        BookOrder,
+        Body(
+            openapi_examples={
+                "tech_book": {
+                    "summary": "A technology book",
+                    "description": "Ordering a popular programming book",
+                    "value": {
+                        "book_title": "The Pragmatic Programmer",
+                        "author": "David Thomas",
+                        "quantity": 3,
+                        "price_per_copy": 599.00,
+                        "genre": "Technology"
+                    }
+                },
+                "fiction_book": {
+                    "summary": "A fiction novel",
+                    "description": "Ordering a bestselling novel",
+                    "value": {
+                        "book_title": "The Alchemist",
+                        "author": "Paulo Coelho",
+                        "quantity": 1,
+                        "price_per_copy": 299.00,
+                        "genre": "Fiction"
+                    }
+                },
+                "bulk_order": {
+                    "summary": "Bulk order (no genre)",
+                    "description": "A large quantity order without a genre specified",
+                    "value": {
+                        "book_title": "Clean Code",
+                        "author": "Robert C. Martin",
+                        "quantity": 50,
+                        "price_per_copy": 749.00
+                    }
+                }
+            }
+        )
+    ]
+):
+    total = round(order.quantity * order.price_per_copy, 2)
+    return {
+        "message": "Book order created successfully",
+        "order_details": order.model_dump(),
+        "total_price_inr": total
+    }
