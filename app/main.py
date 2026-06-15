@@ -1,3 +1,5 @@
+from uuid import UUID, uuid4, uuid5, NAMESPACE_DNS
+from fastapi import FastAPI, Path, HTTPException
 import random
 from fastapi_pagination import Page, add_pagination, paginate
 import json
@@ -15,7 +17,11 @@ from datetime import datetime
 from decimal import Decimal
 from uuid import UUID, uuid4
 
-app = FastAPI()
+app = FastAPI(
+    title="UUID API",
+    description="Simple API to generate, validate, and inspect UUIDs",
+    version="1.0.0",
+)
 
 class Post(BaseModel):
     title:str
@@ -704,3 +710,76 @@ async def create_book_order(
         "order_details": order.model_dump(),
         "total_price_inr": total
     }
+
+class UUIDRequest(BaseModel):
+    name: str                   # used for uuid5 (name-based)
+ 
+ 
+class UUIDResponse(BaseModel):
+    uuid: str
+    version: int
+ 
+ 
+# ── Routes ────────────────────────────────────────────────────────────────────
+ 
+@app.get(
+    "/uuid/generate",
+    response_model=UUIDResponse,
+    summary="Generate a random UUID (v4)",
+    tags=["UUID"],
+)
+def generate_uuid():
+    """Generates a new random UUID version 4."""
+    new_id = uuid4()
+    return UUIDResponse(uuid=str(new_id), version=new_id.version)
+ 
+ 
+@app.post(
+    "/uuid/generate/named",
+    response_model=UUIDResponse,
+    summary="Generate a name-based UUID (v5)",
+    tags=["UUID"],
+)
+def generate_named_uuid(body: UUIDRequest):
+    """
+    Generates a deterministic UUID version 5 from a name string.
+    Same name always produces the same UUID.
+    """
+    named_id = uuid5(NAMESPACE_DNS, body.name)
+    return UUIDResponse(uuid=str(named_id), version=named_id.version)
+ 
+ 
+@app.get(
+    "/uuid/validate/{uuid}",
+    summary="Validate a UUID string",
+    tags=["UUID"],
+)
+def validate_uuid(
+    uuid: str = Path(description="UUID string to validate"),
+):
+    """Checks whether the given string is a valid UUID and returns its details."""
+    try:
+        parsed = UUID(uuid)
+        return {
+            "valid": True,
+            "uuid": str(parsed),
+            "version": parsed.version,
+            "int": parsed.int,
+            "hex": parsed.hex,
+            "urn": parsed.urn,
+        }
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"'{uuid}' is not a valid UUID")
+ 
+ 
+@app.get(
+    "/uuid/batch",
+    summary="Generate multiple UUIDs at once",
+    tags=["UUID"],
+)
+def batch_generate(count: int = 5):
+    """Generates up to 20 random UUIDs in one call."""
+    if count < 1 or count > 20:
+        raise HTTPException(status_code=400, detail="count must be between 1 and 20")
+    return {"uuids": [str(uuid4()) for _ in range(count)]}
+ 
